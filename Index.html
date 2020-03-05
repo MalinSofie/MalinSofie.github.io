@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<head>
+    <title>Gjestebok</title>
+    
+</head>
+<body>
+    <h1>Gjestebok</h1>
+    
+    <p>Skriv inn ditt navn og en hilsen</p>
+    
+    <form>
+        <div>
+            Navn:
+            <input type="text" id="txtNavn">
+        </div>
+        <div>
+            Hilsen:
+            <input type="text" id="txtHilsen">
+        </div>
+        <div>
+            <input type="button" id="btnSendInn" value="Send Inn"  onclick="sendInn()">
+            <input type="button" id="btnHentUt" value="Hent Ut" onclick="visDatabase()">
+
+        </div>
+        
+        <p>Hilsner sendt nå:</p>
+        <div id="hilsenNå"></div>
+        
+        <p>Tidligere hilsner: </p>
+        <div id="gjesteListe"></div>
+           
+    </form>
+    
+
+        
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.9.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.9.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.9.1/firebase-database.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script>
+      // Your web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: "AIzaSyDHIODEh2OnBxYXAcJkp3n-xir9DDlWZWE",
+        authDomain: "gjestebok2.firebaseapp.com",
+        databaseURL: "https://gjestebok2.firebaseio.com",
+        projectId: "gjestebok2",
+        storageBucket: "gjestebok2.appspot.com",
+        messagingSenderId: "686801428260",
+        appId: "1:686801428260:web:67b450e3b1855935611db1"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+        let db = firebase.database()
+        let gjestebok = db.ref("gjestebok")
+        let txtNavn = document.querySelector("#txtNavn")
+        let txtHilsen = document.querySelector("#txtHilsen")
+        let hilsenNå = document.querySelector("#hilsenNå")
+        let gjesteListe = document.querySelector("#gjesteListe")
+
+        function sendInn() {
+            let navn_in = txtNavn.value
+            let hilsen_in = txtHilsen.value 
+            var today = new Date();
+            var dateTime = today.getFullYear()+"0"+today.getMonth()+1+""+today.getDate()+""+today.getHours()+""+today.getMinutes()+""+today.getSeconds();
+            let new_object = gjestebok.child(dateTime);
+            
+            console.log(navn_in +  hilsen_in)
+            hilsenNå.innerHTML +=`<div>${navn_in} sa ${hilsen_in}</div>`
+            
+            new_object.set(
+                {
+                navn : navn_in , hilsen : hilsen_in
+            }
+            )
+            
+            window.alert("hilsen lagt tii i database")
+        }
+        
+        function visDatabase() {
+            function visDatabase_hjelpefunksjon(snapshot){
+                let timestamp = snapshot.key;
+                let navn_og_hilsen = snapshot.val();
+                gjesteListe.innerHTML += `<div>Navn: ${navn_og_hilsen.navn} - Hilsen: ${navn_og_hilsen.hilsen}</div>`
+            }
+            gjestebok.on("child_added", visDatabase_hjelpefunksjon);
+        }
+    
+    
+    </script>
+    
+    
+
+</body>
